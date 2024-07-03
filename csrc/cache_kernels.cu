@@ -434,7 +434,7 @@ __global__ void convert_fp8_kernel(const Tin* __restrict__ src_cache,
   }
 }
 
-}  // namespace vllm
+}  // namespace vllm 
 
 #define CALL_CONVERT_FP8(Tout, Tin, KV_DTYPE)                                \
   vllm::convert_fp8_kernel<Tout, Tin, KV_DTYPE><<<grid, block, 0, stream>>>( \
