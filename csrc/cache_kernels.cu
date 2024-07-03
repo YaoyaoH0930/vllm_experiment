@@ -358,14 +358,7 @@ void reshape_and_cache(
   printf("Free Tokens: %ld\n", free_tokens);
   printf("Used Tokens: %ld\n", used_tokens);
 
-  DISPATCH_BY_KV_CACHE_DTYPE(key.dtype(), kv_cache_dtype,
-                             ([&] {
-    reshape_and_cache_kernel<scalar_t, cache_t, kv_dt><<<grid, block, 0, stream>>>(
-        key.data_ptr<scalar_t>(), value.data_ptr<scalar_t>(), 
-        key_cache.data_ptr<cache_t>(), value_cache.data_ptr<cache_t>(), 
-        slot_mapping.data_ptr<int64_t>(), key_stride, value_stride, 
-        num_heads, head_size, block_size, x, kv_scale);
-  }));
+  DISPATCH_BY_KV_CACHE_DTYPE(key.dtype(), kv_cache_dtype,CALL_RESHAPE_AND_CACHE)
 }
 
 void reshape_and_cache_flash(
@@ -417,7 +410,7 @@ void reshape_and_cache_flash(
   const cudaStream_t stream = at::cuda::getCurrentCUDAStream();
   VLLM_DISPATCH_FLOATING_TYPES(
       key.scalar_type(), "reshape_and_cache_flash", [&] {
-        reshape_and_cache_flash_kernel<scalar_t>
+        vllm::reshape_and_cache_flash_kernel<scalar_t>
             <<<grid, block, 0, stream>>>(
                 key.data_ptr<scalar_t>(), value.data_ptr<scalar_t>(),
                 k_cache.data_ptr<scalar_t>(), v_cache.data_ptr<scalar_t>(),
